@@ -1,0 +1,12 @@
+#!/bin/bash
+echo Beginnt mit der Installation von Ship Happens:
+echo Installiert die nötigen Qt Bibliotheken aus dem Repository
+sudo apt-get install libqt4-core libqt4-gui libqt4-network qt4-qmake make g++
+
+echo Kompiliert
+qmake
+make
+make clean
+
+echo Das Spiel wird gestartet
+./Ship_Happens
