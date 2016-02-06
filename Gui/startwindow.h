@@ -1,12 +1,16 @@
+/*******************************************************************************
+ * Window where you can choose your username and if you're the host or client  *
+ * Author: Felix Fischer                                                       *
+ *******************************************************************************/
 #ifndef STARTWINDOW_H
 #define STARTWINDOW_H
 
 #include "Gui/setwindow.h"
 #include "Gui/listwindow.h"
 #include "playwindow.h"
-#include "myserver.h"
-#include "mysocket.h"
-#include <QMainWindow>
+//#include "myserver.h"
+//#include "mysocket.h"
+#include "networkstuff.h"
 #include <QString>
 #include <QDebug>
 
@@ -16,7 +20,7 @@ class StartWindow;
 
 /**
  * @brief The StartWindow class
- * the StartWindow-class provides all the objects of the other windows and
+ * \nhe StartWindow-class provides all the objects of the other windows and
  */
 class StartWindow : public QMainWindow
 {
@@ -33,9 +37,10 @@ private:
     ListWindow *listW;
     SetWindow *setW;
     PlayWindow *playW;
-    MyServer *server;
-    MySocket *socket;
+    NetworkStuff *socket;
+    //NetworkStuff *server;
     bool host;
+    bool gameStarted; // Flag to prevent multiple instances of the playWindow
     int numb;
 
 signals:

@@ -364,7 +364,8 @@ char* Board::send_set_squares(char *squares) {
             }
         }
     }
-    //std::cout << squares << std::endl;
+    squares[Board::lenght * Board::widht] = '\0'; // Felix 04.02.16
+    std::cout << squares << std::endl; //Debugging
     return squares;
 }
 

@@ -13,8 +13,8 @@ class PlayWindow;
 
 /**
  * @brief The PlayWindow class
- * this is the class for the Window where the game acctually happens
- * it contains two QTableWidgets which are use as boards the left is the board of the player
+ * \nthis is the class for the Window where the game acctually happens\n
+ * it contains two QTableWidgets which are use as boards the left is the board of the player\n
  * and on the left the enemy board is displayed to get bombed by the player
  */
 class PlayWindow : public QMainWindow

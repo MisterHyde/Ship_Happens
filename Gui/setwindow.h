@@ -8,8 +8,7 @@
 #include <QPixmap>
 #include "game.h"
 #include "player.h"
-#include "myserver.h"
-#include "mysocket.h"
+#include "networkstuff.h"
 
 namespace Ui {
 class SetWindow;
@@ -17,7 +16,7 @@ class SetWindow;
 
 /**
  * @brief The SetWindow class
- * in this window the player can set his ships
+ * \nin this window the player can set his ships
  */
 class SetWindow : public QMainWindow
 {
@@ -29,8 +28,8 @@ public:
 
     Game &getGameRef();
     //QTableWidget *getTable();
-    void setHost(MyServer *serve);
-    void setClient(MySocket *socke);
+    void setHost(NetworkStuff *serve);
+    void setClient(NetworkStuff *socke);
 
 
 
@@ -66,13 +65,15 @@ private:
     bool occupied;
     char *board;
     QList<Square*> squareList;
+    bool boardArrived; // A flag which is set if the board of the opponent has arrived
+    bool boardFinished; // A flag which indicates the own board is ready
 
     void tableManagement();
     void refresh(int);
     char* cutBoard();
     void oneStepBack();
-    MyServer *server;
-    MySocket *socket;
+    NetworkStuff *server;
+    NetworkStuff *socket;
 
 
 signals:
@@ -92,7 +93,7 @@ private slots:
     void setPlayerShip();
     void changeDirection();
     void checkSet();
-    void getBoard();
+    void getBoard(char *pBoard);
     //void resqueTable(int a, int b);
 
 

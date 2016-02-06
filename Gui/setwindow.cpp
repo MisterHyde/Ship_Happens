@@ -9,7 +9,7 @@
 /**
  * @brief SetWindow::SetWindow
  * @param parent
- * Constructor of the SetWindow-class
+ * \nConstructor of the SetWindow-class
  */
 SetWindow::SetWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,6 +27,8 @@ SetWindow::SetWindow(QWidget *parent) :
     sqSize = 47;
     occupied = false;
     board = new char[100];
+    boardArrived = false;
+    boardFinished = false;
 
     uii->setupUi(this);
     uii->shipTable->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
@@ -46,9 +48,9 @@ SetWindow::SetWindow(QWidget *parent) :
     game.change_enemy_name(enemyN);
     tableManagement();
     if(host)
-        uii->startButton->setText("Start");
+        uii->startButton->setText(tr("Start"));
     else
-        uii->startButton->setText("Bereit");
+        uii->startButton->setText(tr("Bereit"));
 
     connect(uii->fieldTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(getItems(QTableWidgetItem*)));
     connect(uii->destroyerButton, SIGNAL(clicked()), this, SLOT(selectDestroyer()));
@@ -63,7 +65,7 @@ SetWindow::SetWindow(QWidget *parent) :
 
 /**
  * @brief SetWindow::~SetWindow
- * Deconstructor
+ * \nDeconstructor
  */
 SetWindow::~SetWindow()
 {
@@ -72,30 +74,39 @@ SetWindow::~SetWindow()
 
 }
 
-void SetWindow::getBoard(){
-    if(host){
-        game.receive_enemy_board_from_network(server->Receive_Board());
+void SetWindow::getBoard(char* pBoard){
+    game.receive_enemy_board_from_network(pBoard);
+    boardArrived = true;
+    if(boardFinished){
+        emit startGame();
     }
 }
 
 /**
  * @brief SetWindow::checkSet
- * Slot that checks if all ships are set
- * sends the board to the network
+ * \nSlot that checks if all ships are set\n
+ * sends the board to the network\n
  * emits the startGame() to start the PlayWindow
  */
 void SetWindow::checkSet()
 {
-    if((sub == -1) && (dest == -1) && (batt == -1) && (air == -1)){
+    //if((sub == -1) && (dest == -1) && (batt == -1) && (air == -1)){
+    if(air == -1){ // for testing
         if(host){
-            game.receive_enemy_board_from_network(game.send_board_to_network(board));
-            //server->Send_Board(game.send_board_to_network(board));
+            //game.receive_enemy_board_from_network(game.send_board_to_network(board));
+            boardFinished = true;
+            server->sendBoard(game.send_board_to_network(board));
 
         }
         else{
-            socket->Send_Board(game.send_board_to_network(board));
+            boardFinished = true;
+            socket->sendBoard(game.send_board_to_network(board));
         }
-        emit startGame();
+
+        // While the board of the other player wait for it
+        if(boardArrived){
+            emit startGame();
+        }
     }
     else
         uii->statusbar->showMessage("Es muessen erst alle Schiffe plaziert werden.",5000);
@@ -104,7 +115,7 @@ void SetWindow::checkSet()
 /**
  * @brief SetWindow::getItems
  * @param item
- * Saves the items witch are changed trough the dropEvent in a QList
+ * \nSaves the items witch are changed trough the dropEvent in a QList
  */
 void SetWindow::getItems(QTableWidgetItem *item)
 {
@@ -140,7 +151,7 @@ void SetWindow::oneStepBack(){
 
 /**
  * @brief SetWindow::setPlayerShip
- * calls the place_ships function of the game-class (logic)
+ * \ncalls the place_ships function of the game-class (logic)
  */
 void SetWindow::setPlayerShip()
 {
@@ -234,7 +245,7 @@ void SetWindow::setPlayerShip()
 /**
  * @brief SetWindow::getEnemyName
  * @param n
- * Slot to get the name of the player from the startWindow
+ * \nSlot to get the name of the player from the startWindow
  */
 void SetWindow::setPlayerName(QString n)
 {
@@ -246,7 +257,7 @@ void SetWindow::setPlayerName(QString n)
 
 /**
  * @brief SetWindow::changeDirection
- * change the direction how the ships are displayed and the string of the directionButton
+ * \nchange the direction how the ships are displayed and the string of the directionButton
  */
 void SetWindow::changeDirection()
 {
@@ -272,7 +283,7 @@ void SetWindow::changeDirection()
 
 /**
  * @brief SetWindow::selectSubmarine
- * set the shipTable with two items for draging it to the fieldTable
+ * \nset the shipTable with two items for draging it to the fieldTable
  */
 void SetWindow::selectSubmarine()
 {
@@ -309,7 +320,7 @@ void SetWindow::selectSubmarine()
 
 /**
  * @brief SetWindow::selectDestroyer
- * Set the shipTable with three items for draging it to the fieldTable
+ * \nSet the shipTable with three items for draging it to the fieldTable
  */
 void SetWindow::selectDestroyer()
 {
@@ -354,7 +365,7 @@ void SetWindow::selectDestroyer()
 
 /**
  * @brief SetWindow::selectBattleship
- * Set the shipTable with four items for draging it to the fieldTable
+ * \nSet the shipTable with four items for draging it to the fieldTable
  */
 void SetWindow::selectBattleship()
 {
@@ -406,7 +417,7 @@ void SetWindow::selectBattleship()
 
 /**
  * @brief SetWindow::selectAirCarrier
- * Set the shipTable with five items for draging it to the fieldTable
+ * \nSet the shipTable with five items for draging it to the fieldTable
  */
 void SetWindow::selectAirCarrier()
 {
@@ -463,7 +474,7 @@ void SetWindow::selectAirCarrier()
 
 /**
  * @brief SetWindow::tableManagement
- * set the size, headernames of the rows and columns and fills the fieldTable with items with blue background
+ * \nset the size, headernames of the rows and columns and fills the fieldTable with items with blue background
  */
 void SetWindow::tableManagement()
 {
@@ -510,19 +521,21 @@ Game &SetWindow::getGameRef()
 /**
  * @brief SetWindow::setHost
  * @param h
- * get the information from the StartWindow if this player is host or not
+ * \nget the information from the StartWindow if this player is host or not
  */
-void SetWindow::setHost(MyServer *serve)
+void SetWindow::setHost(NetworkStuff *serve)
 {
     server = serve;
     host = true;
-    uii->startButton->setText("Start");
-    connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
+    uii->startButton->setText(tr("Start"));
+    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
 }
 
-void SetWindow::setClient(MySocket *socke)
+void SetWindow::setClient(NetworkStuff *socke)
 {
     socket = socke;
     host = false;
+    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
     uii->startButton->setText("Bereit");
 }

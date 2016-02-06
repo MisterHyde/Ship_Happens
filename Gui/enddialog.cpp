@@ -6,7 +6,7 @@
  * @param name
  * @param win
  * @param parent
- * Constructor
+ * \nConstructor
  */
 EndDialog::EndDialog(std::string name, bool win, QWidget *parent) :
     QDialog(parent),
@@ -29,7 +29,7 @@ EndDialog::EndDialog(std::string name, bool win, QWidget *parent) :
 
 /**
  * @brief EndDialog::~EndDialog
- * Destructor
+ * \nDestructor
  */
 EndDialog::~EndDialog()
 {

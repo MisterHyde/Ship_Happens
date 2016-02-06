@@ -6,7 +6,7 @@
  * @param h
  * @param _game
  * @param parent
- * constructor of the PlayWindow class
+ * \nconstructor of the PlayWindow class
  *
  */
 PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
@@ -55,12 +55,12 @@ PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
     connect(ui->enemyTable, SIGNAL(cellClicked(int,int)), this, SLOT(setBomb(int,int)));
     connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
     connect(this, SIGNAL(quitSignal()), parent, SLOT(revenge()));
-    game.printBoards();
+    //game.printBoards();
 }
 
 /**
  * @brief PlayWindow::~PlayWindow
- * Deconstructor
+ * \nDeconstructor
  */
 PlayWindow::~PlayWindow()
 {
@@ -69,8 +69,8 @@ PlayWindow::~PlayWindow()
 
 /**
  * @brief PlayWindow::revenge
- * slot connected to the Ja-Button in the EndDialog window
- * close the EndDialog and the PlayWindow
+ * \nslot connected to the Ja-Button in the EndDialog window\n
+ * close the EndDialog and the PlayWindow\n
  * emit the quitSignal() connected to the revenge() slot of StartWindow
  */
 void PlayWindow::revenge()
@@ -84,8 +84,8 @@ void PlayWindow::revenge()
  * @brief PlayWindow::setBomb
  * @param r <y-coordinate of the bombed square>
  * @param c <x-coordinate of the bombed square>
- * slot connected to the cellClicked signal of the enemys board
- * checks if the square is set or not and get the square hit
+ * \nslot connected to the cellClicked signal of the enemys board\n
+ * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
  */
 void PlayWindow::setBomb(int r, int c)
@@ -150,8 +150,8 @@ void PlayWindow::setBomb(int r, int c)
  * @brief PlayWindow::getBombed
  * @param r <y-coordinate of the bombed square>
  * @param c <x-coordinate of the bombed square>
- * slot connected to the cellClicked signal of the players board
- * checks if the square is set or not and get the square hit
+ * \nslot connected to the cellClicked signal of the players board\n
+ * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
  */
 void PlayWindow::getBombed(int r, int c)
@@ -194,7 +194,7 @@ void PlayWindow::getBombed(int r, int c)
 
 /**
  * @brief PlayWindow::tableManagement
- * set the size, headernames of the rows and columns and fills the enemyTable with items with blue backgrounds
+ * \nset the size, headernames of the rows and columns and fills the enemyTable with items with blue backgrounds
  */
 void PlayWindow::tableManagement()
 {

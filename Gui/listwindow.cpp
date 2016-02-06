@@ -5,9 +5,9 @@
  * @brief ListWindow::ListWindow
  * @param s
  * @param parent
- * Constructor
+ * \nConstructor
  */
-ListWindow::ListWindow(MySocket *s, QWidget *parent) :
+ListWindow::ListWindow(NetworkStuff *s, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ListWindow)
 {
@@ -24,7 +24,7 @@ ListWindow::ListWindow(MySocket *s, QWidget *parent) :
 
 /**
  * @brief ListWindow::~ListWindow
- * Deconstructor
+ * \nDeconstructor
  */
 ListWindow::~ListWindow()
 {
@@ -33,23 +33,24 @@ ListWindow::~ListWindow()
 
 /**
  * @brief ListWindow::startClicked
- * slot connected to the StartButton
+ * \nslot connected to the StartButton\n
  * opens a TcpSocket with the given ip adress of the server and prints an error if the connection failed
  */
 void ListWindow::startClicked()
 {
     ui->label_2->setText("Verbinden...");
-    if(socke->Start_Socket(ip)){
+    socke->startSocket(ip); // == QAbstractSocket::ConnectedState;
         emit connected();
-    }
-    else
-        ui->label_2->setText("Socket konnte nicht gestartet werden.");
+        //socke->sendShot((quint16)8,(quint16)9);
+    //}
+    //else
+    //    ui->label_2->setText("Socket konnte nicht gestartet werden.");
 }
 
 /**
  * @brief ListWindow::setIP
  * @param i
- * slot connected to the lineEdit
+ * \nslot connected to the lineEdit\n
  * saves the in lineEdit entered ip adress in the attribute ip
  */
 void ListWindow::setIP(QString i)

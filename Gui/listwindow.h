@@ -2,7 +2,7 @@
 #define LISTWINDOW_H
 
 #include <QMainWindow>
-#include "mysocket.h"
+#include "networkstuff.h"
 
 namespace Ui {
 class ListWindow;
@@ -10,7 +10,7 @@ class ListWindow;
 
 /**
  * @brief The ListWindow class
- * provide a window to enter the ip of the server
+ * \nprovide a window to enter the ip of the server\n
  * after that it connects to the server
  */
 class ListWindow : public QMainWindow
@@ -18,14 +18,14 @@ class ListWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit ListWindow(MySocket *s, QWidget *parent);
+    explicit ListWindow(NetworkStuff *s, QWidget *parent);
     ~ListWindow();
     //QString getIP();
     
 private:
     Ui::ListWindow *ui;
     QString ip;
-    MySocket *socke;
+    NetworkStuff *socke;
 
 signals:
     void connected();

@@ -10,7 +10,7 @@ class EndDialog;
 
 /**
  * @brief The EndDialog class
- * provides EndDialog window where the player is asked if he want to play a revenge or not
+ * \nprovides EndDialog window where the player is asked if he want to play a revenge or not
  */
 class EndDialog : public QDialog
 {
