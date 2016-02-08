@@ -74,7 +74,8 @@ SetWindow::~SetWindow()
 
 }
 
-void SetWindow::getBoard(char* pBoard){
+void SetWindow::getBoard(char* pBoard)
+{
     game.receive_enemy_board_from_network(pBoard);
     boardArrived = true;
     if(boardFinished){

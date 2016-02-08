@@ -76,10 +76,18 @@ QByteArray NetworkStuff::receiveData(){
     data = tcpSocket->readAll();
     qDebug() << "Angekommene Daten:" << data << data.size();
 
-    if(data.size() == 2)
+    if(data.size() == 2){
         emit shotReceived(data[0], data[1]);
-    else if(data.size() == 100)
+    }
+    else if(data.size() > 100){
+        QString msg = (QString)data;
+        int typeLength = msg.indexOf(":");
+        QString type = msg;
+        type.remove(msg.size()-101,msg.size());
+        msg.remove(0, (msg.size()-100));
+
         emit boardReceived(data.data());
+    }
 
     qDebug() << "Daten erhalten:" << data;
     /// \todo Is it neccessary that the received message is returned?
@@ -155,8 +163,12 @@ void NetworkStuff::sendBoard(char *board){
  * @brief NetworkStuff::receiveBoard
  * @return
  * \nAnother wraper for receiveBoard(). Returns the received board
+ * \todo wird gar nicht aufgerufen...
  */
 char *NetworkStuff::receiveBoard(){
+    //QString msg = QString(receiveData.data());
+    //QString type = msg.remove(0, msg.size()-100);
+
     return receiveData().data();
 }
 
