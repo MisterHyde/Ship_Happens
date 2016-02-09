@@ -6,6 +6,7 @@
 #include "game.h"
 #include <QPainter>
 #include "enddialog.h"
+#include "networkstuff.h"
 
 namespace Ui {
 class PlayWindow;
@@ -22,7 +23,7 @@ class PlayWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit PlayWindow(bool h, Game _game, QWidget *parent);
+    explicit PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *parent);
     ~PlayWindow();
     
 
@@ -44,8 +45,9 @@ private:
     bool host;
     QImage templatBlue;
     QImage templatBlack;
-    int countOwn;
-    int countOther;
+    int countOwn;   /// the amount of not bombed with own ships occupied squares
+    int countOther; /// the amount of not bombed with enemy ships occupied squares
+    NetworkStuff *socket;
 
     void tableManagement();
     void setShips();
@@ -55,8 +57,8 @@ signals:
     void quitSignal();
 
 private slots:
-    void setBomb(int a, int b);
-    void getBombed(int r, int c);
+    void setBomb(int row, int column);
+    void getBombed(quint16 row, quint16 column);
 
 public slots:
     //void setGameRef(Game &_game);

@@ -25,8 +25,6 @@ HEADERS += game.h \
 		   Gui/listwindow.h \
 		   Gui/playwindow.h \
     Gui/enddialog.h \
-    network/mysocket.h \
-    network/myserver.h \
     network/networkstuff.h
 FORMS += Gui/setwindow.ui Gui/startwindow.ui \
 		 Gui/listwindow.ui \
@@ -47,8 +45,6 @@ SOURCES += game.cpp \
 		   Gui/listwindow.cpp \
 		   Gui/playwindow.cpp \
     Gui/enddialog.cpp \
-    network/mysocket.cpp \
-    network/myserver.cpp \
     network/networkstuff.cpp
 
 OTHER_FILES +=

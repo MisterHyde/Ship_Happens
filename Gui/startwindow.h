@@ -4,6 +4,8 @@
  *******************************************************************************/
 #ifndef STARTWINDOW_H
 #define STARTWINDOW_H
+#ifndef GRAPHIC
+#define GRAPHIC
 
 #include "Gui/setwindow.h"
 #include "Gui/listwindow.h"
@@ -58,4 +60,5 @@ public slots:
     void revenge();
 };
 
+#endif //GRAPHIC
 #endif // STARTWINDOW_H

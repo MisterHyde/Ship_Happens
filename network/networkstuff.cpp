@@ -60,7 +60,7 @@ bool NetworkStuff::sendData(const QString &pData, const QString &pType){
 
     QByteArray type = pType.toUtf8();
     QByteArray data = pData.toUtf8();
-    QByteArray msg = type.size() + type + data;
+    QByteArray msg = QByteArray::number(type.size()) + type + data;
     qDebug() << "Zu übertragende Zeichen:" << msg;
     return tcpSocket->write(msg) == msg.size();
 }
@@ -76,16 +76,47 @@ QByteArray NetworkStuff::receiveData(){
     data = tcpSocket->readAll();
     qDebug() << "Angekommene Daten:" << data << data.size();
 
+    if(data.isEmpty()){
+        qDebug() << "NetworkStuff::receiveData(): Message ist empty";
+    }
+
+    QString msg = (QString)data;
+    QString buff = msg.mid(0,1);
+    quint8 typeSize = buff.toInt();
+    QString type = msg.mid(1, typeSize);
+    msg = msg.mid(typeSize+1);
+
+    switch(stringToTypes(type)){
+        case BOARD:
+            data = msg.toUtf8();
+            emit boardReceived(data.data());
+            break;
+        case SHOT:
+            int x;
+            x = msg.mid(0,1).toInt();
+            int y;
+            y = msg.mid(1,2).toInt();
+            emit shotReceived(x, y);
+            break;
+        case NAME:
+            break;
+        case NAMEREQUEST:
+            break;
+        default:
+            qDebug() << "NetworkStuff::receiveData(): Get bad message";
+    }
+
     if(data.size() == 2){
         emit shotReceived(data[0], data[1]);
     }
     else if(data.size() > 100){
         QString msg = (QString)data;
-        int typeLength = msg.indexOf(":");
+        //int typeLength = msg.indexOf(":");
         QString type = msg;
         type.remove(msg.size()-101,msg.size());
         msg.remove(0, (msg.size()-100));
-
+        // Convert to QByteArray so it could be converted to char* because the game class doesn't use qt
+        data = msg.toUtf8();
         emit boardReceived(data.data());
     }
 
@@ -116,6 +147,7 @@ void NetworkStuff::startServerSocket(){
  */
 int NetworkStuff::startSocket(QString ip){
     tcpSocket->connectToHost(QHostAddress(ip), port);
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(receiveData()));
     /// \todo Here a litte pause wasn't that bad especially because after this function comes an if which just works if SocketState== 3 (means ConnectedState)
     delay(1);
     connected = true;
@@ -139,6 +171,7 @@ void NetworkStuff::sendShot(quint16 x, quint16 y){
  * @brief NetworkStuff::receiveShot
  * @return
  * \nA wraper for receiveData() to convert the message into the needet format (struct shot).
+ * \todo unused function here. I thought I should seperate the different types of message. But I didn't
  */
 NetworkStuff::shot NetworkStuff::receiveShot(){
     char * data = receiveData().data();
@@ -188,3 +221,20 @@ QString NetworkStuff::getLastError(){
     return lastError;
 }
 
+///\todo Get rid of this hole mTypes thing and do it with QMap
+quint8 NetworkStuff::stringToTypes(QString pStr)
+{
+    mTypes blub;
+    if(pStr == "BOARD")
+        blub = BOARD;
+    if(pStr == "NAME")
+        blub = NAME;
+    if(pStr == "NAMEREQUEST")
+        blub = NAMEREQUEST;
+    if(pStr == "SHOT")
+        blub = SHOT;
+    if(pStr == "CHANGESTAT")
+        blub = CHANGESTAT;
+
+    return blub;
+}

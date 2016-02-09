@@ -28,7 +28,7 @@ private:
     };
 
     enum mTypes{
-        NAME,NAMEREQUEST,SHOT,BOARD
+        NAME,NAMEREQUEST,SHOT,BOARD,CHANGESTAT
     };
 
     QTcpServer *tcpServer;
@@ -40,6 +40,8 @@ private:
     QString lastError;
 
     void delay(quint8 s);
+    quint8 stringToTypes(QString pStr);
+
 
 public:
     explicit NetworkStuff( QString cliserv, QObject *parent = 0);
@@ -64,7 +66,6 @@ private slots:
     bool sendData(const QString &pData, const QString &pType);
     QByteArray receiveData();
     void startServerSocket();
-
 };
 
 #endif // NETWORKSTUFF_H

@@ -101,7 +101,7 @@ void StartWindow::listWindowClosed()
 void StartWindow::startGame()
 {
     if(!gameStarted){
-        playW = new PlayWindow(host, setW->getGameRef(), this);
+        playW = new PlayWindow(host, setW->getGameRef(), socket, this);
         setW->close();
         playW->show();
         gameStarted = true;

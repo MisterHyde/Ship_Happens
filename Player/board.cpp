@@ -67,9 +67,10 @@ Board::Board() {
  * @param size_t _y
  * @param Board::lenght = _x
  * @param Board::lenght = _y
+ * /// \todo unused variables
  */
 Board::Board(size_t _x, size_t _y) {
-
+    if(_x == _y){;}
 }
 
 

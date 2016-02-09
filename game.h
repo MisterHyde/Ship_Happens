@@ -99,7 +99,9 @@ public:
     bool getEnemyState();                // FF GUI1
     bool getPlayerState();              // FF GUI1
     void setStartActivity(bool);       // FF GUI1
-    Player& getPlayer();              // FF GUI1
+    Player getPlayer();               // FF GUI1
+    bool checkEnemyLoose();          // FF GUI1
+    bool checkPlayerLoose();        // FF GUI1
 };
 
 #endif // GAME_H

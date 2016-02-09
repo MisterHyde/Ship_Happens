@@ -9,14 +9,15 @@
  * \nconstructor of the PlayWindow class
  *
  */
-PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
+PlayWindow::PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayWindow),
     game(_game),
     playerBoard(game.getBoardRef()),
     enemyBoard(game.getEnemyBoardRef()),
     black(QColor(0,0,0)), red(QColor(255,0,0)),
-    host(h)
+    host(h),
+    socket(pSocket)
 {
 
     ui->setupUi(this);
@@ -33,7 +34,7 @@ PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
     tableManagement();
 
     pen.setColor(Qt::black);
-    templatBlack = QImage("/home/felix/Documents/prog/Field/images/sea.png");
+    templatBlack = QImage(45, 45, QImage::Format_RGB32);
     painter.begin(&templatBlack);
     painter.setPen(pen);
     for(int i=0;i<templatBlack.height();i++)
@@ -43,7 +44,7 @@ PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
     painter.end();
 
     pen.setColor(Qt::blue);
-    templatBlue = QImage("/home/felix/Documents/prog/Field/images/sea.png");
+    templatBlue = QImage(45, 45, QImage::Format_RGB32);
     painter.begin(&templatBlue);
     painter.setPen(pen);
     for(int i=0;i<templatBlue.height();i++)
@@ -53,7 +54,8 @@ PlayWindow::PlayWindow(bool h, Game _game, QWidget *parent) :
     painter.end();
 
     connect(ui->enemyTable, SIGNAL(cellClicked(int,int)), this, SLOT(setBomb(int,int)));
-    connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
+    connect(socket, SIGNAL(shotReceived(quint16,quint16)), this, SLOT(getBombed(quint16,quint16)));
+    //connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
     connect(this, SIGNAL(quitSignal()), parent, SLOT(revenge()));
     //game.printBoards();
 }
@@ -88,21 +90,23 @@ void PlayWindow::revenge()
  * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
  */
-void PlayWindow::setBomb(int r, int c)
+void PlayWindow::setBomb(int row, int column)
 {
     if(!game.getPlayerState()){
-        ui->statusbar->showMessage("Der andere Spieler ist am Zug.",4000);
+        ui->statusbar->showMessage(tr("Der andere Spieler ist am Zug."), 4000);
         return;
     }
 
-    if(enemyBoard.get_Square_ptr((size_t)c+1,(size_t)r+1)->get_square_hit()){
-        ui->statusbar->showMessage("Dieses Feld wurde schon bombardiert.",4000);
+    if(enemyBoard.get_Square_ptr((size_t)column+1,(size_t)row+1)->get_square_hit()){
+        ui->statusbar->showMessage(tr("Dieses Feld wurde schon bombardiert."), 4000);
         return;
     }
 
     int size = ui->enemyTable->iconSize().height();
-    QImage temp = QImage("/home/felix/Documents/prog/Field/images/white");
-    if(enemyBoard.get_Square_ptr((size_t)(c+1),(size_t)(r+1))->get_square_set()){
+    QImage temp = QImage(45, 45, QImage::Format_RGB32);
+    // If the bombed square is occupied by an ship draw an red dot an count down the count down the square which are occupied
+    if(enemyBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->get_square_set()){
+        // Just drawing the bombed ship part
         pen.setColor(Qt::black);
         painter.begin(&temp);
         painter.setPen(pen);
@@ -111,19 +115,23 @@ void PlayWindow::setBomb(int r, int c)
                 painter.drawPoint(i,j);
             }
         painter.end();
+        // Drawing the red dot
         pen.setColor(red);
         painter.begin(&temp);
         painter.setPen(pen);
         painter.drawPoint(((size/2-0.5)),((size/2-0.5)));
         painter.end();
-        ui->statusbar->showMessage("Yeaaaayyy das war der Gegner.",4000);
-        game.bomb_square((size_t)(c+1),(size_t)(r+1));
+        ui->statusbar->showMessage(tr("Yeaaaayyy das war der Gegner."), 4000);
+        // Tell the logic that this square was bombed
+        game.bomb_square((size_t)(column+1),(size_t)(row+1));
         countOther -=1;
-        if(!game.change_activity_status() && countOther == 0){
+        //if(!game.change_activity_status() && countOther == 0){
+        if(game.checkEnemyLoose()){
             endD = new EndDialog(game.get_player_name(),true,this);
             endD->show();
         }
     }
+    // If there was just water paint a black dot, bomb the square and change player activity
     else{
         pen.setColor(Qt::blue);
         painter.begin(&temp);
@@ -138,12 +146,14 @@ void PlayWindow::setBomb(int r, int c)
         painter.setPen(pen);
         painter.drawPoint(((size/2)-0.5),((size/2)-0.5));
         painter.end();
-        ui->statusbar->showMessage("Das war leider nur Wasser.",4000);
-        enemyBoard.get_Square_ptr((size_t)(c+1),(size_t)(r+1))->set_hit();
+        ui->statusbar->showMessage(tr("Das war leider nur Wasser."), 4000);
+        enemyBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->set_hit();
         game.change_activity_status();
 
     }
-    ui->enemyTable->item(r,c)->setBackground(temp);
+
+    ui->enemyTable->item(row,column)->setBackground(temp);
+    socket->sendShot(row,column);
 }
 
 /**
@@ -154,29 +164,29 @@ void PlayWindow::setBomb(int r, int c)
  * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
  */
-void PlayWindow::getBombed(int r, int c)
+void PlayWindow::getBombed(quint16 row, quint16 column)
 {
-    if(game.getPlayerState()){
-        ui->statusbar->showMessage("Der andere Spieler ist am Zug.",4000);
-        return;
-    }
+//    if(game.getPlayerState()){
+//        ui->statusbar->showMessage("Der andere Spieler ist am Zug.",4000);
+//        return;
+//    }
 
     int size = ui->enemyTable->iconSize().height();
     QImage temp = templatBlue;
-    if(playerBoard.get_Square_ptr((size_t)(c+1),(size_t)(r+1))->get_square_set()){
+    if(playerBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->get_square_set()){
         pen.setColor(red);
         painter.begin(&temp);
         painter.setPen(pen);
         painter.drawPoint(((size/2-0.5)),((size/2-0.5)));
         painter.end();
         ui->statusbar->showMessage("Yeaaaayyy das war der Gegner.",4000);
-        game.bomb_square((size_t)(c+1),(size_t)(r+1));
+        game.bomb_square((size_t)(column+1),(size_t)(row+1));
         countOwn -= 1;
-        if(game.change_activity_status() && countOwn == 0){
+        //if(game.change_activity_status() && countOwn == 0){
+        if(game.checkPlayerLoose()){
             endD = new EndDialog(game.get_player_name(),false,this);
             endD->show();
         }
-        game.change_activity_status();
     }
     else{
         pen.setColor(black);
@@ -185,11 +195,11 @@ void PlayWindow::getBombed(int r, int c)
         painter.drawPoint(((size/2)-0.5),((size/2)-0.5));
         painter.end();
         ui->statusbar->showMessage("Das war leider nur Wasser.");
-        playerBoard.get_Square_ptr((size_t)(c+1),(size_t)(r+1))->set_hit();
+        playerBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->set_hit();
         game.change_activity_status();
 
     }
-    ui->playerTable->item(r,c)->setBackground(QBrush(temp));
+    ui->playerTable->item(row,column)->setBackground(QBrush(temp));
 }
 
 /**
@@ -223,13 +233,13 @@ void PlayWindow::tableManagement()
             table->setRowHeight(i,sqSize);
 
         // fills the fields of the table with squareg items
-        QPixmap sea("/home/felix/Documents/prog/Field/images/sea.png");
-        QPixmap top("/home/felix/Documents/prog/Field/images/top.png");
-        QPixmap mid("/home/felix/Documents/prog/Field/images/middle.png");
-        QPixmap bot("/home/felix/Documents/prog/Field/images/bottom.png");
-        QPixmap left("/home/felix/Documents/prog/Field/images/left.png");
-        QPixmap vmid("/home/felix/Documents/prog/Field/images/vmiddle.png");
-        QPixmap right("/home/felix/Documents/prog/Field/images/right.png");
+//        QPixmap sea("/home/felix/Documents/prog/Field/images/sea.png");
+//        QPixmap top("/home/felix/Documents/prog/Field/images/top.png");
+//        QPixmap mid("/home/felix/Documents/prog/Field/images/middle.png");
+//        QPixmap bot("/home/felix/Documents/prog/Field/images/bottom.png");
+//        QPixmap left("/home/felix/Documents/prog/Field/images/left.png");
+//        QPixmap vmid("/home/felix/Documents/prog/Field/images/vmiddle.png");
+//        QPixmap right("/home/felix/Documents/prog/Field/images/right.png");
         for(size_t i=0;i<(size_t)width;i++){
             for(size_t j=0;j<(size_t)height;j++){
                 if(k == 1){
