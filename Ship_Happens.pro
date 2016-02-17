@@ -27,8 +27,8 @@ HEADERS += game.h \
            Gui/enddialog.h \
            network/networkstuff.h
 
-FORMS += Gui/setwindow.ui 
-		 Gui/startwindow.ui \
+FORMS += Gui/setwindow.ui \
+         Gui/startwindow.ui \
          Gui/listwindow.ui \
          Gui/playwindow.ui \
          Gui/enddialog.ui
