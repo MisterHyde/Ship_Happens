@@ -57,7 +57,7 @@ void StartWindow::openGame()
 
     setW->setWindowTitle("Ship Happens!");
     setW->setPlayerName(name);
-    setW->setHost(socket);
+    setW->setNetwork(socket, true);
     setW->show();
     hide();
 }
@@ -88,7 +88,8 @@ void StartWindow::listWindowClosed()
     listW->close();
     delete listW;
     setW->setWindowTitle("Ship Happens!");
-    setW->setClient(socket);
+    setW->setNetwork(socket, false);
+    socket->requestName(name);
     setW->show();
 }
 
@@ -122,10 +123,7 @@ void StartWindow::revenge()
         delete playW;
         delete setW;
         setW = new SetWindow(this);
-        if(host)
-            setW->setHost(socket);
-        else
-            setW->setClient(socket);
+        setW->setNetwork(socket, host);
         setW->show();
     }
 }

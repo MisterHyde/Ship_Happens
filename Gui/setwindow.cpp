@@ -31,7 +31,7 @@ SetWindow::SetWindow(QWidget *parent) :
     boardFinished = false;
 
     uii->setupUi(this);
-    uii->shipTable->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+    uii->shipTable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     uii->statusbar->showMessage("Plazieren Sie Ihre Schiffe.");
     uii->submarineButton->setText("U-Boot " + QString::number(sub) + "x");
     uii->destroyerButton->setText("Zerstoerer " + QString::number(dest) + "x");
@@ -44,8 +44,8 @@ SetWindow::SetWindow(QWidget *parent) :
     setWindowIcon(QPixmap("images/ship.png"));
     setWindowTitle("Ship Happens");
 
-    std::string enemyN = "Ganzer Peter";
-    game.change_enemy_name(enemyN);
+    //std::string enemyN = "Ganzer Peter";
+
     tableManagement();
     if(host)
         uii->startButton->setText(tr("Start"));
@@ -93,16 +93,19 @@ void SetWindow::checkSet()
 {
     //if((sub == -1) && (dest == -1) && (batt == -1) && (air == -1)){
     if(air == -1){ // for testing
-        if(host){
-            //game.receive_enemy_board_from_network(game.send_board_to_network(board));
-            boardFinished = true;
-            server->sendBoard(game.send_board_to_network(board));
+//        if(host){
+//            //game.receive_enemy_board_from_network(game.send_board_to_network(board));
+//            boardFinished = true;
+//            server->sendBoard(game.send_board_to_network(board));
 
-        }
-        else{
-            boardFinished = true;
-            socket->sendBoard(game.send_board_to_network(board));
-        }
+//        }
+//        else{
+//            boardFinished = true;
+//            socket->sendBoard(game.send_board_to_network(board));
+//        }
+
+        boardFinished = true;
+        socket->sendBoard(game.send_board_to_network(board));
 
         // While the board of the other player wait for it
         if(boardArrived){
@@ -258,6 +261,13 @@ void SetWindow::setPlayerName(QString n)
     std::string hmmm = name.toStdString();
     game.change_player_name(hmmm);
     setWindowTitle("Ship Happens");
+}
+
+void SetWindow::setEnemyName(QString pName)
+{
+    enemyName = pName;
+    std::string hmm = enemyName.toStdString();
+    game.change_enemy_name(hmm);
 }
 
 /**
@@ -528,19 +538,42 @@ Game &SetWindow::getGameRef()
  * @param h
  * \nget the information from the StartWindow if this player is host or not
  */
-void SetWindow::setHost(NetworkStuff *serve)
+//void SetWindow::setHost(NetworkStuff *serve)
+//{
+//    server = serve;
+//    host = true;
+//    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+//    connect(server, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+//    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
+//    uii->startButton->setText(tr("Start"));
+//}
+
+//void SetWindow::setClient(NetworkStuff *socke)
+//{
+//    socket = socke;
+//    host = false;
+//    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+//    connect(socket, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+//    uii->startButton->setText("Bereit");
+//}
+
+void SetWindow::setNetwork(NetworkStuff *pSocket, bool server)
 {
-    server = serve;
-    host = true;
-    uii->startButton->setText(tr("Start"));
-    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
+    socket = pSocket;
+    host = server;
+    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+    connect(socket, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+    connect(socket, SIGNAL(nameRequest(QString)), this, SLOT(sendName(QString)));
+
+    if(server)
+        uii->startButton->setText("Start");
+    else
+        uii->startButton->setText("Bereit");
 }
 
-void SetWindow::setClient(NetworkStuff *socke)
+void SetWindow::sendName(QString pName)
 {
-    socket = socke;
-    host = false;
-    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-    uii->startButton->setText("Bereit");
+    enemyName = pName;
+    std::string hmm = enemyName.toStdString();
+    game.change_enemy_name(hmm);
 }

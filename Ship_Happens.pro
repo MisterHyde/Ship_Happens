@@ -22,14 +22,17 @@ HEADERS += game.h \
            Player/Ships/destroyer.h \
            Player/Ships/ship.h \
            Player/Ships/submarine.h \
-		   Gui/listwindow.h \
-		   Gui/playwindow.h \
-    Gui/enddialog.h \
-    network/networkstuff.h
-FORMS += Gui/setwindow.ui Gui/startwindow.ui \
-		 Gui/listwindow.ui \
-		 Gui/playwindow.ui \
-    Gui/enddialog.ui
+           Gui/listwindow.h \
+           Gui/playwindow.h \
+           Gui/enddialog.h \
+           network/networkstuff.h
+
+FORMS += Gui/setwindow.ui 
+		 Gui/startwindow.ui \
+         Gui/listwindow.ui \
+         Gui/playwindow.ui \
+         Gui/enddialog.ui
+
 SOURCES += game.cpp \
            main.cpp \
            Gui/setwindow.cpp \
@@ -42,9 +45,9 @@ SOURCES += game.cpp \
            Player/Ships/destroyer.cpp \
            Player/Ships/ship.cpp \
            Player/Ships/submarine.cpp \
-		   Gui/listwindow.cpp \
-		   Gui/playwindow.cpp \
-    Gui/enddialog.cpp \
-    network/networkstuff.cpp
+           Gui/listwindow.cpp \
+           Gui/playwindow.cpp \
+           Gui/enddialog.cpp \
+           network/networkstuff.cpp
 
 OTHER_FILES +=

@@ -28,10 +28,9 @@ public:
 
     Game &getGameRef();
     //QTableWidget *getTable();
-    void setHost(NetworkStuff *serve);
-    void setClient(NetworkStuff *socke);
-
-
+//    void setHost(NetworkStuff *serve);
+//    void setClient(NetworkStuff *socke);
+    void setNetwork(NetworkStuff *socket, bool server);
 
 private:
     Ui::SetWindow *uii;
@@ -40,6 +39,7 @@ private:
     Game game;
     //Board playerBoard;
     QString name;
+    QString enemyName;
     int width;					// width of the field
     int height;					// height of the field
     int sqSize;					// The size of a square
@@ -67,14 +67,13 @@ private:
     QList<Square*> squareList;
     bool boardArrived; // A flag which is set if the board of the opponent has arrived
     bool boardFinished; // A flag which indicates the own board is ready
+    //NetworkStuff *server;
+    NetworkStuff *socket;
 
     void tableManagement();
     void refresh(int);
     char* cutBoard();
     void oneStepBack();
-    NetworkStuff *server;
-    NetworkStuff *socket;
-
 
 signals:
     //void sendTable(QTableWidget *);
@@ -82,6 +81,7 @@ signals:
 
 public slots:
     void setPlayerName(QString);
+    void setEnemyName(QString);
 
 private slots:
     void selectSubmarine();
@@ -94,9 +94,8 @@ private slots:
     void changeDirection();
     void checkSet();
     void getBoard(char *pBoard);
+    void sendName(QString pName);
     //void resqueTable(int a, int b);
-
-
 };
 
 #endif // SETWINDOW_H

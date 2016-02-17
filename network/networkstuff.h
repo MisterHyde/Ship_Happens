@@ -50,13 +50,17 @@ public:
     void sendBoard(char *board);
     char *receiveBoard();
     QString getLastError(); // Returns the last error message of this class
+    void requestName(QString pName);
+    void sendName(QString pName);
 
     QStringList types;
 
 signals:
     //void sendReady();
-    void shotReceived(quint16, quint16);
+    void shotReceived(int, int);
     void boardReceived(char*);
+    void nameReceived(QString);
+    void nameRequest(QString);
 
 public slots:
     int startSocket(QString ip);

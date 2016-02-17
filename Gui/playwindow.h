@@ -58,7 +58,7 @@ signals:
 
 private slots:
     void setBomb(int row, int column);
-    void getBombed(quint16 row, quint16 column);
+    void getBombed(int row, int column);
 
 public slots:
     //void setGameRef(Game &_game);

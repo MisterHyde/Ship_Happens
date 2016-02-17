@@ -99,26 +99,28 @@ QByteArray NetworkStuff::receiveData(){
             emit shotReceived(x, y);
             break;
         case NAME:
+            emit nameReceived(msg);
             break;
         case NAMEREQUEST:
+            emit nameRequest(msg);
             break;
         default:
             qDebug() << "NetworkStuff::receiveData(): Get bad message";
     }
 
-    if(data.size() == 2){
-        emit shotReceived(data[0], data[1]);
-    }
-    else if(data.size() > 100){
-        QString msg = (QString)data;
-        //int typeLength = msg.indexOf(":");
-        QString type = msg;
-        type.remove(msg.size()-101,msg.size());
-        msg.remove(0, (msg.size()-100));
-        // Convert to QByteArray so it could be converted to char* because the game class doesn't use qt
-        data = msg.toUtf8();
-        emit boardReceived(data.data());
-    }
+//    if(data.size() == 2){
+//        emit shotReceived(data[0], data[1]);
+//    }
+//    else if(data.size() > 100){
+//        QString msg = (QString)data;
+//        //int typeLength = msg.indexOf(":");
+//        QString type = msg;
+//        type.remove(msg.size()-101,msg.size());
+//        msg.remove(0, (msg.size()-100));
+//        // Convert to QByteArray so it could be converted to char* because the game class doesn't use qt
+//        data = msg.toUtf8();
+//        emit boardReceived(data.data());
+//    }
 
     qDebug() << "Daten erhalten:" << data;
     /// \todo Is it neccessary that the received message is returned?
@@ -217,23 +219,34 @@ void NetworkStuff::delay(quint8 s)
         QApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
-QString NetworkStuff::getLastError(){
+QString NetworkStuff::getLastError()
+{
     return lastError;
+}
+
+void NetworkStuff::requestName(QString pName)
+{
+    sendData(pName, types.at(mTypes::NAMEREQUEST));
+}
+
+void NetworkStuff::sendName(QString pName)
+{
+    sendData(pName, types.at(mTypes::NAME));
 }
 
 ///\todo Get rid of this hole mTypes thing and do it with QMap
 quint8 NetworkStuff::stringToTypes(QString pStr)
 {
     mTypes blub;
-    if(pStr == "BOARD")
+    if(pStr.contains("BOARD"))
         blub = BOARD;
-    if(pStr == "NAME")
+    else if(pStr.contains("NAME"))
         blub = NAME;
-    if(pStr == "NAMEREQUEST")
+    else if(pStr.contains("NAMEREQUEST"))
         blub = NAMEREQUEST;
-    if(pStr == "SHOT")
+    else if(pStr.contains("SHOT"))
         blub = SHOT;
-    if(pStr == "CHANGESTAT")
+    else if(pStr.contains("CHANGESTAT"))
         blub = CHANGESTAT;
 
     return blub;

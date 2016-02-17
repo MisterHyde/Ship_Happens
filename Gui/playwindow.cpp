@@ -54,7 +54,7 @@ PlayWindow::PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *paren
     painter.end();
 
     connect(ui->enemyTable, SIGNAL(cellClicked(int,int)), this, SLOT(setBomb(int,int)));
-    connect(socket, SIGNAL(shotReceived(quint16,quint16)), this, SLOT(getBombed(quint16,quint16)));
+    connect(socket, SIGNAL(shotReceived(int,int)), this, SLOT(getBombed(int,int)));
     //connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
     connect(this, SIGNAL(quitSignal()), parent, SLOT(revenge()));
     //game.printBoards();
@@ -164,16 +164,12 @@ void PlayWindow::setBomb(int row, int column)
  * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
  */
-void PlayWindow::getBombed(quint16 row, quint16 column)
+void PlayWindow::getBombed(int row, int column)
 {
-//    if(game.getPlayerState()){
-//        ui->statusbar->showMessage("Der andere Spieler ist am Zug.",4000);
-//        return;
-//    }
-
     int size = ui->enemyTable->iconSize().height();
     QImage temp = templatBlue;
     if(playerBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->get_square_set()){
+        temp = templatBlack;
         pen.setColor(red);
         painter.begin(&temp);
         painter.setPen(pen);
