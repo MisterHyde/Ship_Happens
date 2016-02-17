@@ -28,7 +28,7 @@ private:
     };
 
     enum mTypes{
-        NAME,NAMEREQUEST,SHOT,BOARD
+        NAME,NAMEREQUEST,SHOT,BOARD,CHANGESTAT
     };
 
     QTcpServer *tcpServer;
@@ -40,6 +40,8 @@ private:
     QString lastError;
 
     void delay(quint8 s);
+    quint8 stringToTypes(QString pStr);
+
 
 public:
     explicit NetworkStuff( QString cliserv, QObject *parent = 0);
@@ -48,13 +50,17 @@ public:
     void sendBoard(char *board);
     char *receiveBoard();
     QString getLastError(); // Returns the last error message of this class
+    void requestName(QString pName);
+    void sendName(QString pName);
 
     QStringList types;
 
 signals:
     //void sendReady();
-    void shotReceived(quint16, quint16);
+    void shotReceived(int, int);
     void boardReceived(char*);
+    void nameReceived(QString);
+    void nameRequest(QString);
 
 public slots:
     int startSocket(QString ip);
@@ -64,7 +70,6 @@ private slots:
     bool sendData(const QString &pData, const QString &pType);
     QByteArray receiveData();
     void startServerSocket();
-
 };
 
 #endif // NETWORKSTUFF_H

@@ -129,15 +129,15 @@ bool Game::change_activity_status() {
     if(Game::player.get_active()) {
         Game::player.set_not_active();
         Game::enemy.set_active();
-        //return true;  // Origin
-        return Game::enemy.get_lost();          // FF GUI1
+        return true;  // Origin
+        //return Game::enemy.get_lost();          // FF GUI1
     }
 
     else if (Game::enemy.get_active()) {
         Game::enemy.set_not_active();
         Game::player.set_active();
-        //return true;  // Origin
-        return Game::player.get_lost();         // FF GUI1
+        return true;  // Origin
+        //return Game::player.get_lost();         // FF GUI1
     }
     return false;
 }
@@ -1069,9 +1069,19 @@ void Game::setStartActivity(bool host)
     }
 }
 
-Player& Game::getPlayer()
+Player Game::getPlayer()
 {
-    Player &p = Game::player;
-    return p;
+    return player;
 }
+
+bool Game::checkEnemyLoose()
+{
+    return enemy.get_lost();
+}
+
+bool Game::checkPlayerLoose()
+{
+    return player.get_lost();
+}
+
 //GUI1 END

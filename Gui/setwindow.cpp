@@ -31,7 +31,7 @@ SetWindow::SetWindow(QWidget *parent) :
     boardFinished = false;
 
     uii->setupUi(this);
-    uii->shipTable->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+    uii->shipTable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     uii->statusbar->showMessage("Plazieren Sie Ihre Schiffe.");
     uii->submarineButton->setText("U-Boot " + QString::number(sub) + "x");
     uii->destroyerButton->setText("Zerstoerer " + QString::number(dest) + "x");
@@ -44,8 +44,8 @@ SetWindow::SetWindow(QWidget *parent) :
     setWindowIcon(QPixmap("images/ship.png"));
     setWindowTitle("Ship Happens");
 
-    std::string enemyN = "Ganzer Peter";
-    game.change_enemy_name(enemyN);
+    //std::string enemyN = "Ganzer Peter";
+
     tableManagement();
     if(host)
         uii->startButton->setText(tr("Start"));
@@ -74,7 +74,8 @@ SetWindow::~SetWindow()
 
 }
 
-void SetWindow::getBoard(char* pBoard){
+void SetWindow::getBoard(char* pBoard)
+{
     game.receive_enemy_board_from_network(pBoard);
     boardArrived = true;
     if(boardFinished){
@@ -92,16 +93,19 @@ void SetWindow::checkSet()
 {
     //if((sub == -1) && (dest == -1) && (batt == -1) && (air == -1)){
     if(air == -1){ // for testing
-        if(host){
-            //game.receive_enemy_board_from_network(game.send_board_to_network(board));
-            boardFinished = true;
-            server->sendBoard(game.send_board_to_network(board));
+//        if(host){
+//            //game.receive_enemy_board_from_network(game.send_board_to_network(board));
+//            boardFinished = true;
+//            server->sendBoard(game.send_board_to_network(board));
 
-        }
-        else{
-            boardFinished = true;
-            socket->sendBoard(game.send_board_to_network(board));
-        }
+//        }
+//        else{
+//            boardFinished = true;
+//            socket->sendBoard(game.send_board_to_network(board));
+//        }
+
+        boardFinished = true;
+        socket->sendBoard(game.send_board_to_network(board));
 
         // While the board of the other player wait for it
         if(boardArrived){
@@ -121,8 +125,9 @@ void SetWindow::getItems(QTableWidgetItem *item)
 {
     squareList.append(game.getBoardRef().get_Square_ptr((size_t)item->column()+1,(size_t)item->row()+1));
     itemList << item;
-    int row = item->row();
-    int column = item->column();
+    /// \todo unused variables
+    //int row = item->row();
+    //int column = item->column();
     if(itemList.size() == zaehler){
         for(int i=squareList.size();i<5;i++){
             squareList.append(NULL);
@@ -136,13 +141,14 @@ void SetWindow::oneStepBack(){
     for(int i=0;i<zaehler;i++){
         if(squareList[i]->get_square_set()){
             itemList[i]->setBackgroundColor(Qt::black);
-            int row = itemList[i]->row();
-            int column = itemList[i]->column();
+            /// \todo unused variables
+            //int row = itemList[i]->row();
+            //int column = itemList[i]->column();
         }
         else{
             itemList[i]->setBackgroundColor(Qt::blue);
-            int row = itemList[i]->row();
-            int column = itemList[i]->row();
+            //int row = itemList[i]->row();
+            //int column = itemList[i]->row();
         }
     }
     connect(uii->fieldTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(getItems(QTableWidgetItem*)));
@@ -167,6 +173,7 @@ void SetWindow::setPlayerShip()
                 oneStepBack();
             }
             else{
+                ///\todo Here I use a very ugly methode. I was obviously to stupid to check how M-A-D has implemented something
                 game.getPlayer().get_Submarine_ref(sub).set_ship(sq1,sq2);
                 squareList.clear();
                 sub -= 1;
@@ -174,18 +181,17 @@ void SetWindow::setPlayerShip()
             }
             break;
         case 3:
-
             if(!game.place_ships(sq1,sq2,sq3)){
                 oneStepBack();
                 uii->statusbar->showMessage("Hier kann kein Schiff gesetzt werden.",3000);
             }
             else{
+                ///\todo Here I use a very ugly methode. I was obviously to stupid to check how M-A-D has implemented something
                 game.getPlayer().get_Destroyer_ref((size_t)dest).set_ship(sq1,sq2,sq3);
                 squareList.clear();
                 dest -= 1;
                 uii->destroyerButton->setText("Zerstoerer " + QString::number(dest) + "x");
             }
-
             break;
         case 4:
             if(!game.place_ships(sq1,sq2,sq3,sq4)){
@@ -193,6 +199,7 @@ void SetWindow::setPlayerShip()
                 oneStepBack();
             }
             else{
+                ///\todo Here I use a very ugly methode. I was obviously to stupid to check how M-A-D has implemented something
                 game.getPlayer().get_BattleShip_ref(batt).set_ship(sq1,sq2,sq3,sq4);
                 squareList.clear();
                 batt -= 1;
@@ -205,6 +212,7 @@ void SetWindow::setPlayerShip()
                 oneStepBack();
             }
             else{
+                ///\todo Here I use a very ugly methode. I was obviously to stupid to check how M-A-D has implemented something
                 game.getPlayer().get_AirCarrier_ref(air).set_ship(sq1,sq2,sq3,sq4,sq5);
                 squareList.clear();
                 air -= 1;
@@ -253,6 +261,13 @@ void SetWindow::setPlayerName(QString n)
     std::string hmmm = name.toStdString();
     game.change_player_name(hmmm);
     setWindowTitle("Ship Happens");
+}
+
+void SetWindow::setEnemyName(QString pName)
+{
+    enemyName = pName;
+    std::string hmm = enemyName.toStdString();
+    game.change_enemy_name(hmm);
 }
 
 /**
@@ -523,19 +538,42 @@ Game &SetWindow::getGameRef()
  * @param h
  * \nget the information from the StartWindow if this player is host or not
  */
-void SetWindow::setHost(NetworkStuff *serve)
+//void SetWindow::setHost(NetworkStuff *serve)
+//{
+//    server = serve;
+//    host = true;
+//    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+//    connect(server, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+//    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
+//    uii->startButton->setText(tr("Start"));
+//}
+
+//void SetWindow::setClient(NetworkStuff *socke)
+//{
+//    socket = socke;
+//    host = false;
+//    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+//    connect(socket, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+//    uii->startButton->setText("Bereit");
+//}
+
+void SetWindow::setNetwork(NetworkStuff *pSocket, bool server)
 {
-    server = serve;
-    host = true;
-    uii->startButton->setText(tr("Start"));
-    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
+    socket = pSocket;
+    host = server;
+    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
+    connect(socket, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
+    connect(socket, SIGNAL(nameRequest(QString)), this, SLOT(sendName(QString)));
+
+    if(server)
+        uii->startButton->setText("Start");
+    else
+        uii->startButton->setText("Bereit");
 }
 
-void SetWindow::setClient(NetworkStuff *socke)
+void SetWindow::sendName(QString pName)
 {
-    socket = socke;
-    host = false;
-    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-    uii->startButton->setText("Bereit");
+    enemyName = pName;
+    std::string hmm = enemyName.toStdString();
+    game.change_enemy_name(hmm);
 }
