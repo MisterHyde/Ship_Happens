@@ -27,47 +27,62 @@ private:
         int y;
     };
 
+    /**
+     * @brief The mTypes enum
+     * \nDefines the different types of messages in int
+     * \nHas a right to exist because the switch statement needs constant expressions
+     * \nFor a correct enum to string conversation it has to be in the same order as
+     * the QMap typeMap!
+     */
     enum mTypes{
-        NAME,NAMEREQUEST,SHOT,BOARD,CHANGESTAT
+        NAME,NAMEREQUEST,SHOT,BOARD,REVENGE,CHANGESTAT
     };
+
+
+    //static const QMap<int,QString> typeMap;
+    //constexpr static QMap<int,QString> typeMap;
+    QMap<int,QString> typeMap;  ///< Defines the different types of messages in QString
 
     QTcpServer *tcpServer;
     QTcpSocket *tcpSocket;
     //QNetworkSession *networkSession;
     quint16 port;
     QString iam;
+    QString ip;
     bool connected;
     QString lastError;
 
     void delay(quint8 s);
-    quint8 stringToTypes(QString pStr);
+    //quint8 stringToTypes(QString pStr);
 
 
 public:
     explicit NetworkStuff( QString cliserv, QObject *parent = 0);
+    // Wrapper classes for sendData
     void sendShot(quint16 x, quint16 y);
-    shot receiveShot();
     void sendBoard(char *board);
-    char *receiveBoard();
-    QString getLastError(); // Returns the last error message of this class
-    void requestName(QString pName);
+    void requestName(QString pName);    ///< Send your own name and request the enemy to send his
     void sendName(QString pName);
+    QString getLastError(); // Returns the last error message of this class
 
     QStringList types;
+    // Stuipd second type of the QMap to make it possible to make the QMap const
+    //static QMap<int,QString> typeMap2;
 
 signals:
     //void sendReady();
-    void shotReceived(int, int);
-    void boardReceived(char*);
-    void nameReceived(QString);
-    void nameRequest(QString);
+    void shotReceived(int, int);    ///< This signal indicates that the enemy sent a shot
+    void boardReceived(char*);      ///< This signal indicates that the enemy sent his board
+    void nameReceived(QString);     ///< This signal indicates that the enemy sent his name
+    void nameRequest(QString);      ///< This signal indicates that the enemy sent a namerequest
+    void connectingToHost();        ///< If no ip is present emit this signal to open the ListWindow
 
 public slots:
-    int startSocket(QString ip);
+    int startSocket(QString pIp);
 
 private slots:
     void sessionOpened();
-    bool sendData(const QString &pData, const QString &pType);
+    bool sendData(const QString &pData, QString pType);
     QByteArray receiveData();
     void startServerSocket();
 };

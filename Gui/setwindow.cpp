@@ -268,6 +268,7 @@ void SetWindow::setEnemyName(QString pName)
     enemyName = pName;
     std::string hmm = enemyName.toStdString();
     game.change_enemy_name(hmm);
+    qDebug() << "Der Gegner heißt" << enemyName;
 }
 
 /**
@@ -534,29 +535,10 @@ Game &SetWindow::getGameRef()
 }
 
 /**
- * @brief SetWindow::setHost
+ * @brief SetWindow::setNetwork
  * @param h
  * \nget the information from the StartWindow if this player is host or not
  */
-//void SetWindow::setHost(NetworkStuff *serve)
-//{
-//    server = serve;
-//    host = true;
-//    connect(server, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-//    connect(server, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
-//    //connect(server, SIGNAL(sendReady()), this, SLOT(getBoard()));
-//    uii->startButton->setText(tr("Start"));
-//}
-
-//void SetWindow::setClient(NetworkStuff *socke)
-//{
-//    socket = socke;
-//    host = false;
-//    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(getBoard(char*)));
-//    connect(socket, SIGNAL(nameReceived(QString)), this, SLOT(setEnemyName(QString)));
-//    uii->startButton->setText("Bereit");
-//}
-
 void SetWindow::setNetwork(NetworkStuff *pSocket, bool server)
 {
     socket = pSocket;
@@ -576,4 +558,6 @@ void SetWindow::sendName(QString pName)
     enemyName = pName;
     std::string hmm = enemyName.toStdString();
     game.change_enemy_name(hmm);
+    socket->sendName(name);
+    qDebug() << "Der Gegner heißt" <<enemyName;
 }

@@ -27,9 +27,6 @@ public:
     ~SetWindow();
 
     Game &getGameRef();
-    //QTableWidget *getTable();
-//    void setHost(NetworkStuff *serve);
-//    void setClient(NetworkStuff *socke);
     void setNetwork(NetworkStuff *socket, bool server);
 
 private:
@@ -67,7 +64,6 @@ private:
     QList<Square*> squareList;
     bool boardArrived; // A flag which is set if the board of the opponent has arrived
     bool boardFinished; // A flag which indicates the own board is ready
-    //NetworkStuff *server;
     NetworkStuff *socket;
 
     void tableManagement();

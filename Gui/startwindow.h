@@ -31,25 +31,32 @@ class StartWindow : public QMainWindow
 public:
     explicit StartWindow(QWidget *parent = 0);
     ~StartWindow();
+    void setName(QString pName){name = pName;}
+    QString getName(){return name;}
+    void setEnemyName(QString pName){enemyName = pName;}
+    QString getEnemyName(){return enemyName;}
+    void setConnected(bool pConnected){connected = pConnected;}
+    bool getConnected(){return connected;}
     
 private:
     Ui::StartWindow *ui;
 
     QString name;
+    QString enemyName;
     ListWindow *listW;
     SetWindow *setW;
     PlayWindow *playW;
     NetworkStuff *socket;
-    //NetworkStuff *server;
     bool host;
     bool gameStarted; // Flag to prevent multiple instances of the playWindow
+    bool connected;
     int numb;
 
 signals:
     void setStartActivity(bool);
 
 private slots:
-    void getName();
+    void getUserName();
 
 public slots:
 
@@ -58,6 +65,7 @@ public slots:
     void listWindowClosed();
     void startGame();
     void revenge();
+    void showListWindow(); ///< A slot which shows the listWindows if the socket wants to reconnect to another ip
 };
 
 #endif //GRAPHIC

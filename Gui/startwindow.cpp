@@ -18,7 +18,7 @@ StartWindow::StartWindow(QWidget *parent) :
     numb = 0;
     gameStarted = false;
 
-    connect(ui->lineEdit, SIGNAL(editingFinished()), this, SLOT(getName()));
+    connect(ui->lineEdit, SIGNAL(editingFinished()), this, SLOT(getUserName()));
     connect(ui->startGameButton, SIGNAL(clicked()), this, SLOT(openGame()));
     connect(ui->joinGameButton, SIGNAL(clicked()), this, SLOT(joinGame()));
 }
@@ -37,7 +37,7 @@ StartWindow::~StartWindow()
  * @param n
  * \nsaves the name if the user entered it in the lineEdit
  */
-void StartWindow::getName()
+void StartWindow::getUserName()
 {
     name = ui->lineEdit->text();
 }
@@ -70,11 +70,21 @@ void StartWindow::openGame()
 void StartWindow::joinGame()
 {
     socket = new NetworkStuff("client",this);
+    connect(socket, SIGNAL(connectingToHost()), this, SLOT(showListWindow()));
     numb += 1;
     listW = new ListWindow(socket,this);
     host = false;
     listW->show();
     hide();
+}
+
+/**
+ * @brief StartWindow::showListWindow
+ * \nslot which shows the listWindows if the socket wants to reconnect to another ip
+ */
+void StartWindow::showListWindow()
+{
+    listW = new ListWindow(socket, this);
 }
 
 /**
