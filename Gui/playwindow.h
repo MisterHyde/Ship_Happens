@@ -59,6 +59,7 @@ signals:
 private slots:
     void setBomb(int row, int column);
     void getBombed(int row, int column);
+    void boardReceived(char *board);
 
 public slots:
     //void setGameRef(Game &_game);

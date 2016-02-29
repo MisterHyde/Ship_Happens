@@ -50,5 +50,6 @@ SOURCES += game.cpp \
            Gui/enddialog.cpp \
            network/networkstuff.cpp
 
-OTHER_FILES +=
+OTHER_FILES += \
+    Documentation.md
 

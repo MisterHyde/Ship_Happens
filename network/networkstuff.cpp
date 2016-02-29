@@ -1,14 +1,5 @@
 #include "networkstuff.h"
 
-//NetworkStuff::typeMap2.insert(0, "NAME");
-//NetworkStuff::typeMap2.insert(1, "NAMEREQUEST");
-//NetworkStuff::typeMap2.insert(2, "SHOT");
-//NetworkStuff::typeMap2.insert(3, "BOARD");
-//NetworkStuff::typeMap2.insert(4, "REVENGE");
-//NetworkStuff::typeMap2.insert(5, "CHANGESTAT");
-
-//const QMap<int,QString> NetworkStuff::typeMap = typeMap2;
-
 /**
  * @brief NetworkStuff::NetworkStuff
  * @param cliserv
@@ -112,30 +103,32 @@ QByteArray NetworkStuff::receiveData(){
     // Remove the type and the size of the type
     msg = msg.remove(0, typeSize+2);
 
-    //switch(stringToTypes(type)){
-    ///\todo figure out how QMap::key() can be a constexpr-function
-    switch(typeMap.key(type)){
-        case BOARD:
-            data = msg.toUtf8();
-            emit boardReceived(data.data());
-            break;
-        case SHOT:
-        {
-            int x = -1;
-            x = msg.mid(0,1).toInt();
-            int y = -1;
-            y = msg.mid(1,2).toInt();
-            emit shotReceived(x, y);
-            break;
-        }
-        case NAME:
-            emit nameReceived(msg);
-            break;
-        case NAMEREQUEST:
-            emit nameRequest(msg);
-            break;
-        default:
-            qDebug() << "NetworkStuff::receiveData(): Get bad message";
+
+    if(type == typeMap.value(0)){
+        emit nameReceived(msg);
+    }
+    else if(type == typeMap.value(1)){
+        emit nameRequest(msg);
+    }
+    else if(type == typeMap.value(2)){
+        int x = -1;
+        x = msg.mid(0,1).toInt();
+        int y = -1;
+        y = msg.mid(1,2).toInt();
+        emit shotReceived(x, y);
+    }
+    else if(type == typeMap.value(3)){
+        data = msg.toUtf8();
+        emit boardReceived(data.data());
+    }
+    else if(type == typeMap.value(4)){
+        //REVENGE
+    }
+    else if(type == typeMap.value(5)){
+        //CHANGESTAT
+    }
+    else{
+        qDebug() << "Message with unkown type received:" << data;
     }
 
     qDebug() << "Daten erhalten:" << data;

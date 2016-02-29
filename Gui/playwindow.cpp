@@ -24,7 +24,7 @@ PlayWindow::PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *paren
     setWindowTitle("Ship Happens!");
     game.setStartActivity(host);
 
-    ui->label_2->setText("Gewaesser von " + QString::fromStdString(game.get_enemy_name()));
+    ui->label_2->setText("Gewässer von " + QString::fromStdString(game.get_enemy_name()));
     width = 10;
     height = 10;
     sqSize = 45;
@@ -57,7 +57,7 @@ PlayWindow::PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *paren
     connect(socket, SIGNAL(shotReceived(int,int)), this, SLOT(getBombed(int,int)));
     //connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
     connect(this, SIGNAL(quitSignal()), parent, SLOT(revenge()));
-    //game.printBoards();
+    connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(boardReceived(char*)));
 }
 
 /**
@@ -84,8 +84,8 @@ void PlayWindow::revenge()
 
 /**
  * @brief PlayWindow::setBomb
- * @param r <y-coordinate of the bombed square>
- * @param c <x-coordinate of the bombed square>
+ * @param row <y-coordinate of the bombed square>
+ * @param column <x-coordinate of the bombed square>
  * \nslot connected to the cellClicked signal of the enemys board\n
  * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
@@ -158,8 +158,8 @@ void PlayWindow::setBomb(int row, int column)
 
 /**
  * @brief PlayWindow::getBombed
- * @param r <y-coordinate of the bombed square>
- * @param c <x-coordinate of the bombed square>
+ * @param row <y-coordinate of the bombed square>
+ * @param column <x-coordinate of the bombed square>
  * \nslot connected to the cellClicked signal of the players board\n
  * checks if the square is set or not and get the square hit\n
  * draws depending of set or not a red or black point on the square
@@ -176,7 +176,7 @@ void PlayWindow::getBombed(int row, int column)
         painter.drawPoint(((size/2-0.5)),((size/2-0.5)));
         painter.end();
         ui->statusbar->showMessage("Yeaaaayyy das war der Gegner.",4000);
-        game.bomb_square((size_t)(column+1),(size_t)(row+1));
+        //game.bomb_square((size_t)(column+1),(size_t)(row+1));
         countOwn -= 1;
         //if(game.change_activity_status() && countOwn == 0){
         if(game.checkPlayerLoose()){
@@ -191,7 +191,7 @@ void PlayWindow::getBombed(int row, int column)
         painter.drawPoint(((size/2)-0.5),((size/2)-0.5));
         painter.end();
         ui->statusbar->showMessage("Das war leider nur Wasser.");
-        playerBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->set_hit();
+        //enemyBoard.get_Square_ptr((size_t)(column+1),(size_t)(row+1))->set_hit();
         game.change_activity_status();
 
     }
@@ -228,14 +228,6 @@ void PlayWindow::tableManagement()
         for(int i=0;i<width;i++)
             table->setRowHeight(i,sqSize);
 
-        // fills the fields of the table with squareg items
-//        QPixmap sea("/home/felix/Documents/prog/Field/images/sea.png");
-//        QPixmap top("/home/felix/Documents/prog/Field/images/top.png");
-//        QPixmap mid("/home/felix/Documents/prog/Field/images/middle.png");
-//        QPixmap bot("/home/felix/Documents/prog/Field/images/bottom.png");
-//        QPixmap left("/home/felix/Documents/prog/Field/images/left.png");
-//        QPixmap vmid("/home/felix/Documents/prog/Field/images/vmiddle.png");
-//        QPixmap right("/home/felix/Documents/prog/Field/images/right.png");
         for(size_t i=0;i<(size_t)width;i++){
             for(size_t j=0;j<(size_t)height;j++){
                 if(k == 1){
@@ -281,4 +273,8 @@ void PlayWindow::countSet(){
                 countOwn +=1;
         }
     }
+}
+
+void PlayWindow::boardReceived(char* pBoard){
+    game.receive_enemy_board_from_network(pBoard);
 }

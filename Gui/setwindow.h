@@ -33,7 +33,7 @@ private:
     Ui::SetWindow *uii;
 
     //Player player;
-    Game game;
+
     //Board playerBoard;
     QString name;
     QString enemyName;
@@ -71,6 +71,8 @@ private:
     char* cutBoard();
     void oneStepBack();
 
+
+
 signals:
     //void sendTable(QTableWidget *);
     void startGame();
@@ -92,6 +94,8 @@ private slots:
     void getBoard(char *pBoard);
     void sendName(QString pName);
     //void resqueTable(int a, int b);
+private:
+    Game game;
 };
 
 #endif // SETWINDOW_H
