@@ -64,6 +64,7 @@ public:
     void requestName(QString pName);    ///< Send your own name and request the enemy to send his
     void sendName(QString pName);
     QString getLastError(); // Returns the last error message of this class
+    void sendRevenge(bool pRev);
 
     QStringList types;
     // Stuipd second type of the QMap to make it possible to make the QMap const
@@ -76,6 +77,7 @@ signals:
     void nameReceived(QString);     ///< This signal indicates that the enemy sent his name
     void nameRequest(QString);      ///< This signal indicates that the enemy sent a namerequest
     void connectingToHost();        ///< If no ip is present emit this signal to open the ListWindow
+    void revengeReceived(bool);     ///< This signal indicates that the enemy sent if he wants a revenge
 
 public slots:
     int startSocket(QString pIp);

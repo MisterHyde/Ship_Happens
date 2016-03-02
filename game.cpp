@@ -192,7 +192,7 @@ void Game::bomb_square(size_t _x, size_t _y) {
  */
 void Game::receive_enemy_board_from_network(char *squares) {
     Game::enemy.return_board_ref().receive_set_squares(squares);
-    enemy_board.print_own_board();
+
 }
 
 

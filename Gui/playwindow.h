@@ -41,7 +41,7 @@ private:
     QColor black, red;
     QPen pen;
     QPainter painter;
-    EndDialog *endD;
+    //EndDialog *endD;
     bool host;
     QImage templatBlue;
     QImage templatBlack;
@@ -54,17 +54,20 @@ private:
     void countSet();
 
 signals:
-    void quitSignal();
+    void quitSignal(bool);
+    void gameEnded(bool);
 
 private slots:
     void setBomb(int row, int column);
     void getBombed(int row, int column);
     void boardReceived(char *board);
+    //void revengeConfirmed(bool pAnswer);
 
 public slots:
     //void setGameRef(Game &_game);
     //void getStartActivity(bool);
     void revenge();
+    void noRevenge();
     //void quitGame();
 };
 

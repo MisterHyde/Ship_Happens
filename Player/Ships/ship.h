@@ -58,7 +58,9 @@ enum {
                                           has been set on the board*/
      static size_t const type = Ship_t;   /**< the type is just an id that can be used
                                           to get a ships type 0 = ship*/
-     static size_t const lenght = 2; /**< the lenght of each ship is meassured in
+     ///\todo Why is this value 2 if the longes ship counts 5 squares
+     // origin: static size_t const lenght = 2;
+     static size_t const lenght = 5; /**< the lenght of each ship is meassured in
                                           Squares it takes on the field*/
      Square* position[lenght];       /**< the position array holds pointer to the
                                           boards squares, the ship has been placed on*/

@@ -56,7 +56,7 @@ PlayWindow::PlayWindow(bool h, Game _game, NetworkStuff *pSocket, QWidget *paren
     connect(ui->enemyTable, SIGNAL(cellClicked(int,int)), this, SLOT(setBomb(int,int)));
     connect(socket, SIGNAL(shotReceived(int,int)), this, SLOT(getBombed(int,int)));
     //connect(ui->playerTable, SIGNAL(cellClicked(int,int)), this, SLOT(getBombed(int,int)));
-    connect(this, SIGNAL(quitSignal()), parent, SLOT(revenge()));
+    //connect(this, SIGNAL(quitSignal(bool)), parent, SLOT(revenge(bool)));
     connect(socket, SIGNAL(boardReceived(char*)), this, SLOT(boardReceived(char*)));
 }
 
@@ -71,16 +71,43 @@ PlayWindow::~PlayWindow()
 
 /**
  * @brief PlayWindow::revenge
- * \nslot connected to the Ja-Button in the EndDialog window\n
- * close the EndDialog and the PlayWindow\n
- * emit the quitSignal() connected to the revenge() slot of StartWindow
+ * \nslot connected to the Ja-Button in the EndDialog window
+ * \nWrapper methode to send quitSignal with "true" to the parent (startwindow)
  */
 void PlayWindow::revenge()
 {
-    endD->close();
-    this->close();
-    emit quitSignal();
+    //socket->sendRevenge(true);
+    //endD->close();
+    //this->close();
+    emit quitSignal(true);
 }
+/**
+ * @brief PlayWindow::noRevenge
+ * \nSlot connected to the Nein-Button in the EndDialog window
+ * \nWrapper methode to send quitSignal with "false" to the parent (startwindow)
+ */
+void PlayWindow::noRevenge()
+{
+    //socket->sendRevenge(false);
+    //parent()->revenge(false);
+    emit quitSignal(false);
+}
+
+/**
+ * @brief PlayWindow::revengeConfirmed
+ * @param pAnswer
+ */
+//void PlayWindow::revengeConfirmed(bool pAnswer)
+//{
+//    if(pAnswer){
+//        endD->close();
+//        this->close();
+//        emit quitSignal(true);
+//    }
+//    else{
+//        emit quitSignal(false);
+//    }
+//}
 
 /**
  * @brief PlayWindow::setBomb
@@ -125,10 +152,11 @@ void PlayWindow::setBomb(int row, int column)
         // Tell the logic that this square was bombed
         game.bomb_square((size_t)(column+1),(size_t)(row+1));
         countOther -=1;
-        //if(!game.change_activity_status() && countOther == 0){
-        if(game.checkEnemyLoose()){
-            endD = new EndDialog(game.get_player_name(),true,this);
-            endD->show();
+        if(countOther == 0){
+        //if(game.checkEnemyLoose()){
+//            endD = new EndDialog(game.get_player_name(),true,this);
+//            endD->show();
+            emit gameEnded(true);
         }
     }
     // If there was just water paint a black dot, bomb the square and change player activity
@@ -178,10 +206,11 @@ void PlayWindow::getBombed(int row, int column)
         ui->statusbar->showMessage("Yeaaaayyy das war der Gegner.",4000);
         //game.bomb_square((size_t)(column+1),(size_t)(row+1));
         countOwn -= 1;
-        //if(game.change_activity_status() && countOwn == 0){
-        if(game.checkPlayerLoose()){
-            endD = new EndDialog(game.get_player_name(),false,this);
-            endD->show();
+        if(countOwn == 0){
+        //if(game.checkPlayerLoose()){
+//            endD = new EndDialog(game.get_player_name(),false,this);
+//            endD->show();
+            emit gameEnded(false);
         }
     }
     else{

@@ -14,6 +14,9 @@ StartWindow::StartWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    waitForRevenge = false;
+    revengeRequested = false;
+
     setW = new SetWindow(this);
     numb = 0;
     gameStarted = false;
@@ -116,25 +119,102 @@ void StartWindow::startGame()
         setW->close();
         playW->show();
         gameStarted = true;
+
+        connect(playW, SIGNAL(gameEnded(bool)), this, SLOT(gameEnded(bool)));
+        connect(socket, SIGNAL(revengeReceived(bool)), this, SLOT(revengeReceived(bool)));
     }
 }
 
 /**
  * @brief StartWindow::revenge
+ * @param pRev
  * \nslot connected to the quitSignal of the revenge() slot in PlayWindow\n
  * close the PlayWindow\n
  * delete the PlayWindow and the SetWindow\n
  * creat and show a new SetWindow
  */
-void StartWindow::revenge()
+void StartWindow::revenge(QAbstractButton* button)
 {
-    if(1){  //Abfrage ob beide Spieler revange wollen
-        playW->close();
+    gameStarted = false;
+
+    bool rev;
+    if(button->text() == "&Yes"){
+        waitForRevenge = true;
+        rev = true;
+    }
+    else
+        rev = false;
+
+    socket->sendRevenge(rev);
+
+    if(rev && revengeRequested){
+        disconnect(playW, SIGNAL(gameEnded(bool)), this, SLOT(gameEnded(bool)));
         delete playW;
         delete setW;
+        delete endD;
         setW = new SetWindow(this);
         setW->setNetwork(socket, host);
         setW->show();
+        waitForRevenge = false;
+        revengeRequested = false;
+    }
+    else if(!rev){
+        delete socket;
+        delete playW;
+        delete setW;
+        delete endD;
+        this->deleteLater();
     }
 }
 
+/**
+ * @brief StartWindow::revengeReceived
+ * @param pRev
+ * \nDoes the same as the revenge() slot except that this slot is called when a REVENGE message is received
+ */
+void StartWindow::revengeReceived(bool pRev)
+{
+    if(pRev && waitForRevenge){
+        delete playW;
+        delete setW;
+        delete endD;
+        setW = new SetWindow(this);
+        setW->setNetwork(socket, host);
+        setW->show();
+        waitForRevenge = false;
+        revengeRequested = false;
+    }
+    else if(pRev){
+        revengeRequested = true;
+    }
+    else if(!pRev){
+        delete socket;
+        delete playW;
+        delete setW;
+        delete endD;
+        this->deleteLater();
+    }
+}
+
+void StartWindow::printTrace(void)
+{
+    void *array[10];
+    size_t size;
+    char **strings;
+    size_t i;
+
+    size = backtrace(array, 20);
+    strings = backtrace_symbols(array, size);
+
+    qDebug() << "Obtained "<< size <<" stack frames.\n";
+
+    for (i = 0; i < size; i++)
+        qDebug() << strings[i];
+
+    free(strings);
+}
+
+void StartWindow::gameEnded(bool pWin){
+    endD = new EndDialog(name, pWin, this);
+    endD->show();
+}

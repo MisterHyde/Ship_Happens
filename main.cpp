@@ -33,11 +33,11 @@ int main (int argc, char *argv[]) {
 
    QApplication a(argc, argv);
 
-   StartWindow startW;
+   StartWindow *startW = new StartWindow;
 
-   startW.setWindowTitle("Ship Happens");
-   startW.setWindowIcon(QPixmap("images/ship.png"));
-   startW.show();
+   startW->setWindowTitle("Ship Happens");
+   startW->setWindowIcon(QPixmap("images/ship.png"));
+   startW->show();
 
    return a.exec();
     /*

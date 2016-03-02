@@ -105,12 +105,15 @@ QByteArray NetworkStuff::receiveData(){
 
 
     if(type == typeMap.value(0)){
+        // NAME
         emit nameReceived(msg);
     }
     else if(type == typeMap.value(1)){
+        // NAMEREQUEST
         emit nameRequest(msg);
     }
     else if(type == typeMap.value(2)){
+        // SHOT
         int x = -1;
         x = msg.mid(0,1).toInt();
         int y = -1;
@@ -118,21 +121,24 @@ QByteArray NetworkStuff::receiveData(){
         emit shotReceived(x, y);
     }
     else if(type == typeMap.value(3)){
+        // BOARD
         data = msg.toUtf8();
         emit boardReceived(data.data());
     }
     else if(type == typeMap.value(4)){
-        //REVENGE
+        // REVENGE
+        if(msg == "1")
+            emit revengeReceived(true);
+        else
+            emit revengeReceived(false);
     }
     else if(type == typeMap.value(5)){
-        //CHANGESTAT
+        // CHANGESTAT
     }
     else{
-        qDebug() << "Message with unkown type received:" << data;
+        lastError = "Message with unkown type received: " + msg;
     }
 
-    qDebug() << "Daten erhalten:" << data;
-    /// \todo Is it neccessary that the received message is returned?
     return data;
 }
 
@@ -202,35 +208,46 @@ void NetworkStuff::delay(quint8 s)
         QApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
+/**
+ * @brief NetworkStuff::getLastError
+ * @return
+ * \nReturns the last error.
+ * \nCurrently usless because there is no error handler
+ */
 QString NetworkStuff::getLastError()
 {
     return lastError;
 }
 
+/**
+ * @brief NetworkStuff::requestName
+ * @param pName
+ * \nWrapper methode for sendData() to send a namerequest with your name
+ */
 void NetworkStuff::requestName(QString pName)
 {
     sendData(pName, "NAMEREQUEST");
 }
 
+/**
+ * @brief NetworkStuff::sendName
+ * @param pName
+ * \nWrapper mehtode for sendData() to send your name
+ */
 void NetworkStuff::sendName(QString pName)
 {
     sendData(pName, "NAME");
 }
 
-///\todo Get rid of this hole mTypes thing and do it with QMap
-//quint8 NetworkStuff::stringToTypes(QString pStr)
-//{
-//    mTypes blub;
-//    if(pStr.contains("BOARD"))
-//        blub = BOARD;
-//    else if(pStr.contains("NAMEREQUEST"))
-//        blub = NAMEREQUEST;
-//    else if(pStr.contains("NAME"))
-//        blub = NAME;
-//    else if(pStr.contains("SHOT"))
-//        blub = SHOT;
-//    else if(pStr.contains("CHANGESTAT"))
-//        blub = CHANGESTAT;
-
-//    return blub;
-//}
+/**
+ * @brief NetworkStuff::sendRevenge
+ * @param pRev
+ * \nWrapper methode for sendData() to send if you want a revenge or not
+ */
+void NetworkStuff::sendRevenge(bool pRev)
+{
+    if(pRev)
+        sendData("1", "REVENGE");
+    else
+        sendData("0", "REVENGE");
+}

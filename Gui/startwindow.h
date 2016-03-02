@@ -13,8 +13,10 @@
 //#include "myserver.h"
 //#include "mysocket.h"
 #include "networkstuff.h"
+#include "enddialog.h"
 #include <QString>
 #include <QDebug>
+#include <execinfo.h>
 
 namespace Ui {
 class StartWindow;
@@ -37,6 +39,7 @@ public:
     QString getEnemyName(){return enemyName;}
     void setConnected(bool pConnected){connected = pConnected;}
     bool getConnected(){return connected;}
+    void printTrace(void);
     
 private:
     Ui::StartWindow *ui;
@@ -47,25 +50,31 @@ private:
     SetWindow *setW;
     PlayWindow *playW;
     NetworkStuff *socket;
+    EndDialog *endD;
     bool host;
     bool gameStarted; // Flag to prevent multiple instances of the playWindow
     bool connected;
     int numb;
+
+    bool waitForRevenge;    ///< Flag which indicates that you sent your opponent a revenge request
+    bool revengeRequested;  ///< Flag which says if the other players requested a revenge game
 
 signals:
     void setStartActivity(bool);
 
 private slots:
     void getUserName();
+    void revengeReceived(bool pRev);
 
 public slots:
-
     void openGame();
     void joinGame();
     void listWindowClosed();
     void startGame();
-    void revenge();
+    //void revenge(bool pRev);
     void showListWindow(); ///< A slot which shows the listWindows if the socket wants to reconnect to another ip
+    void gameEnded(bool pWin);
+    void revenge(QAbstractButton *button);
 };
 
 #endif //GRAPHIC

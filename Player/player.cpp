@@ -399,7 +399,7 @@ void Player::check_ships() {
  * print the players field in the terminal
  */
 void Player::print_field() {
-    Player::own_field.print_own_board();
+    //Player::own_field.print_own_board();
 }
 
 
