@@ -60,6 +60,7 @@ void StartWindow::openGame()
 
     setW->setWindowTitle("Ship Happens!");
     setW->setPlayerName(name);
+    setW->setEnemyName(enemyName);
     setW->setNetwork(socket, true);
     setW->show();
     hide();
@@ -154,6 +155,9 @@ void StartWindow::revenge(QAbstractButton* button)
         delete endD;
         setW = new SetWindow(this);
         setW->setNetwork(socket, host);
+        setW->setWindowTitle("Ship Happens!");
+        socket->nameRequest(name);//        setW->setPlayerName(name);
+//        setW->setEnemyName(enemyName);
         setW->show();
         waitForRevenge = false;
         revengeRequested = false;
@@ -175,11 +179,15 @@ void StartWindow::revenge(QAbstractButton* button)
 void StartWindow::revengeReceived(bool pRev)
 {
     if(pRev && waitForRevenge){
+        disconnect(playW, SIGNAL(gameEnded(bool)), this, SLOT(gameEnded(bool)));
         delete playW;
         delete setW;
         delete endD;
         setW = new SetWindow(this);
         setW->setNetwork(socket, host);
+        setW->setWindowTitle("Ship Happens!");
+        setW->setPlayerName(name);
+        setW->setEnemyName(enemyName);
         setW->show();
         waitForRevenge = false;
         revengeRequested = false;
@@ -194,24 +202,6 @@ void StartWindow::revengeReceived(bool pRev)
         delete endD;
         this->deleteLater();
     }
-}
-
-void StartWindow::printTrace(void)
-{
-    void *array[10];
-    size_t size;
-    char **strings;
-    size_t i;
-
-    size = backtrace(array, 20);
-    strings = backtrace_symbols(array, size);
-
-    qDebug() << "Obtained "<< size <<" stack frames.\n";
-
-    for (i = 0; i < size; i++)
-        qDebug() << strings[i];
-
-    free(strings);
 }
 
 void StartWindow::gameEnded(bool pWin){

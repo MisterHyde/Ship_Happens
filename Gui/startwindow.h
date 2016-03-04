@@ -39,7 +39,6 @@ public:
     QString getEnemyName(){return enemyName;}
     void setConnected(bool pConnected){connected = pConnected;}
     bool getConnected(){return connected;}
-    void printTrace(void);
     
 private:
     Ui::StartWindow *ui;
